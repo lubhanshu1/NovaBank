@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaBank | Core Banking Management & DBMS Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Design System Typography: Instrument Serif, Plus Jakarta Sans, JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="9999" fill="#1e2033" />
+            <path d="M16 8L23 12.5V19.5L16 24L9 19.5V12.5L16 8Z" stroke="#ffffff" stroke-width="1.75" stroke-linejoin="round" />
+            <circle cx="16" cy="16" r="2.5" fill="#e96c2f" />
+          </svg>
+          <div>
+            <div class="brand-title">NovaBank</div>
+            <div class="brand-subtitle">DBMS CORE &bull; INR</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">BANKING OPERATIONS</div>
+        <button class="nav-item active" data-tab="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="accounts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Accounts & Clients
+        </button>
+        <button class="nav-item" data-tab="transactions">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Transfers & Ledger
+        </button>
+        <button class="nav-item" data-tab="loans">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Loans & Facilities
+        </button>
+        <button class="nav-item" data-tab="audit">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Audit Logs (Triggers)
+        </button>
+
+        <div class="nav-section-label" style="margin-top: 28px;">ACADEMIC EXPERIMENTS</div>
+        <button class="nav-item lab-highlight" data-tab="dbms-lab">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2v7.31L4.62 17.5A2 2 0 0 0 6.27 20h11.46a2 2 0 0 0 1.65-2.5L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+          <span>DBMS Live Lab</span>
+          <span class="badge-pill-accent">EXPLAIN</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="db-status-card">
+          <div class="status-indicator-ring">
+            <span class="status-dot-pulse" id="db-indicator"></span>
+          </div>
+          <div class="db-status-info">
+            <span class="db-title" id="db-engine-label">MySQL 8.x (InnoDB)</span>
+            <span class="db-meta" id="db-conn-status">Connected: 127.0.0.1:3306</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header Navigation -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title font-display" id="page-heading">Dashboard</h1>
+          <span class="page-tagline" id="page-subheading">Enterprise Core Banking Metrics & InnoDB Analytics (INR)</span>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Role Persona Switcher -->
+          <div class="persona-switch">
+            <span class="persona-label">ACTIVE ROLE:</span>
+            <select id="persona-selector" class="persona-select">
+              <option value="admin">Admin (All Privileges)</option>
+              <option value="teller1">Teller (Branch Operations)</option>
+              <option value="auditor1">Auditor (Read-Only Views)</option>
+              <option value="kush">Kush Dalal (VIP Customer)</option>
+              <option value="priya">Priya Sharma (Customer)</option>
+            </select>
+            <span class="badge-role" id="current-role-badge">ADMIN</span>
+          </div>
+
+          <button class="btn btn-pill-dark btn-sm" id="btn-quick-transfer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Transfer Funds
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: EXECUTIVE DASHBOARD -->
+      <section id="section-dashboard" class="content-tab active">
+        <!-- Metric KPI Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">TOTAL DEPOSITS (IN RESERVE)</div>
+            <div class="stat-value font-mono" id="stat-total-deposits">₹0.00</div>
+            <div class="stat-meta text-success">Aggregated via <code>vw_customer_account_summary</code></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">TOTAL SETTLED VOLUME</div>
+            <div class="stat-value font-mono" id="stat-total-volume">₹0.00</div>
+            <div class="stat-meta text-secondary" id="stat-total-txns">0 Transactions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ACTIVE LOAN BOOK</div>
+            <div class="stat-value font-mono" id="stat-loan-book">₹0.00</div>
+            <div class="stat-meta text-warm" id="stat-active-loans">0 Active Facilities</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ACTIVE BANK ACCOUNTS</div>
+            <div class="stat-value font-mono" id="stat-active-accounts">0</div>
+            <div class="stat-meta text-muted" id="stat-total-customers">0 Verified Customers</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <div class="surface-card chart-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Daily Transaction Volume & Settlement</h3>
+                <span class="card-subtitle">Aggregated view <code>vw_daily_transaction_metrics</code></span>
+              </div>
+              <span class="pill-badge pill-info">Live Metrics</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-daily-transactions"></canvas>
+            </div>
+          </div>
+          <div class="surface-card chart-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Deposit Balances by Metro Branch</h3>
+                <span class="card-subtitle">Operational view <code>vw_branch_performance</code></span>
+              </div>
+              <span class="pill-badge pill-warm">Branches</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-branch-deposits"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Grid: High Risk Compliance & Recent Transactions -->
+        <div class="dashboard-split-grid">
+          <div class="surface-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">High-Value Compliance Alerts</h3>
+                <span class="card-subtitle">Automated AML screening view <code>vw_high_risk_transactions</code></span>
+              </div>
+              <span class="pill-badge pill-danger">Audit Flags</span>
+            </div>
+            <div class="table-container">
+              <table class="data-table" id="table-high-risk">
+                <thead>
+                  <tr>
+                    <th>Ref No</th>
+                    <th>Account Holder</th>
+                    <th>Amount</th>
+                    <th>Channel</th>
+                    <th>Risk Category</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-high-risk">
+                  <tr><td colspan="5" class="text-center text-muted">Loading compliance alerts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="surface-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Recent Settled Transactions</h3>
+                <span class="card-subtitle">Real-time InnoDB double-entry ledger</span>
+              </div>
+              <button class="btn btn-xs btn-chip" id="btn-refresh-txns">Refresh</button>
+            </div>
+            <div class="table-container">
+              <table class="data-table" id="table-recent-txns">
+                <thead>
+                  <tr>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance After</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-recent-txns">
+                  <tr><td colspan="5" class="text-center text-muted">Loading ledger...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: ACCOUNTS & CLIENTS -->
+      <section id="section-accounts" class="content-tab">
+        <div class="section-actions-bar">
+          <div class="filter-group">
+            <input type="text" id="filter-accounts-search" class="input-search-pill" placeholder="Search account number, customer, city...">
+          </div>
+          <button class="btn btn-pill-dark" id="btn-open-account-modal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Open New Account (sp_open_account)
+          </button>
+        </div>
+
+        <div class="surface-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Core Accounts Ledger</h3>
+              <span class="card-subtitle">Relational accounts bound to customers and branch codes (3NF)</span>
+            </div>
+            <span class="pill-badge" id="accounts-count-badge">0 Accounts</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Account Number</th>
+                  <th>Customer</th>
+                  <th>Branch</th>
+                  <th>Type</th>
+                  <th>Balance</th>
+                  <th>Min Balance</th>
+                  <th>Interest</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-accounts">
+                <tr><td colspan="9" class="text-center text-muted">Loading accounts...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: TRANSFERS & LEDGER -->
+      <section id="section-transactions" class="content-tab">
+        <div class="section-actions-bar">
+          <div class="quick-action-buttons">
+            <button class="btn btn-pill-accent" id="btn-transfer-action">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              Transfer Funds (sp_transfer_funds)
+            </button>
+            <button class="btn btn-pill-sage" id="btn-deposit-action">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              Cash Deposit (sp_deposit_funds)
+            </button>
+            <button class="btn btn-pill-warm" id="btn-withdraw-action">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              Withdraw Cash (sp_withdraw_funds)
+            </button>
+          </div>
+          <div class="filter-group">
+            <select id="filter-txn-type" class="form-select-pill">
+              <option value="">All Transaction Types</option>
+              <option value="TRANSFER_OUT">Transfers Out</option>
+              <option value="TRANSFER_IN">Transfers In</option>
+              <option value="DEPOSIT">Deposits</option>
+              <option value="WITHDRAWAL">Withdrawals</option>
+              <option value="INTEREST_CREDIT">Interest Credits</option>
+              <option value="LOAN_DISBURSEMENT">Loan Disbursements</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="surface-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Immutable Transaction Ledger</h3>
+              <span class="card-subtitle">ACID transactional history with row-level locks and sequence verification</span>
+            </div>
+            <span class="pill-badge pill-info">InnoDB Ledger</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Reference Number</th>
+                  <th>Account</th>
+                  <th>Customer</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Pre-Bal</th>
+                  <th>Post-Bal</th>
+                  <th>Channel</th>
+                  <th>Date & Time</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-full-txns">
+                <tr><td colspan="9" class="text-center text-muted">Loading transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: LOANS & CREDIT -->
+      <section id="section-loans" class="content-tab">
+        <div class="section-actions-bar">
+          <button class="btn btn-pill-dark" id="btn-apply-loan-modal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Apply for Facility (sp_apply_loan)
+          </button>
+        </div>
+
+        <div class="surface-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Loan Facilities & Amortization Book</h3>
+              <span class="card-subtitle">Mathematical EMI calculations with auto-disbursement view <code>vw_loan_portfolio_health</code></span>
+            </div>
+            <span class="pill-badge pill-warm">Portfolio Book</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Loan Number</th>
+                  <th>Borrower</th>
+                  <th>Facility Type</th>
+                  <th>Principal</th>
+                  <th>Interest Rate</th>
+                  <th>Term</th>
+                  <th>Monthly EMI</th>
+                  <th>Outstanding</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-loans">
+                <tr><td colspan="10" class="text-center text-muted">Loading loan portfolio...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: AUDIT LOGS (TRIGGERS) -->
+      <section id="section-audit" class="content-tab">
+        <div class="stats-grid" style="margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-label">TOTAL AUDIT EVENTS</div>
+            <div class="stat-value font-mono" id="audit-total-events">0</div>
+            <div class="stat-meta text-muted">Automatically captured by triggers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">BALANCE ADJUSTMENTS (AFTER UPDATE)</div>
+            <div class="stat-value font-mono text-warm" id="audit-total-updates">0</div>
+            <div class="stat-meta"><code>trg_accounts_after_update</code></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">RECORD INSERTS (AFTER INSERT)</div>
+            <div class="stat-value font-mono text-success" id="audit-total-inserts">0</div>
+            <div class="stat-meta"><code>trg_transactions_after_insert</code></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">LEDGER IMMUTABILITY STATUS</div>
+            <div class="stat-value font-mono text-success">ENFORCED</div>
+            <div class="stat-meta">Zero application-level tampering</div>
+          </div>
+        </div>
+
+        <div class="surface-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Real-Time Database Audit Trail</h3>
+              <span class="card-subtitle">View <code>vw_audit_trail_recent</code> displaying JSON before/after snapshots</span>
+            </div>
+            <span class="pill-badge pill-info">Trigger Fed</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Audit ID</th>
+                  <th>Table</th>
+                  <th>Op</th>
+                  <th>Action Summary</th>
+                  <th>Changed By</th>
+                  <th>Old Values (JSON)</th>
+                  <th>New Values (JSON)</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-audit-logs">
+                <tr><td colspan="8" class="text-center text-muted">Loading audit events...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: THE DBMS ACADEMIC LAB -->
+      <section id="section-dbms-lab" class="content-tab">
+        <!-- Lab Header Banner with Soft Warm/Indigo Tint -->
+        <div class="lab-hero-card">
+          <div class="lab-hero-content">
+            <span class="eyebrow-label">INTERACTIVE SYLLABUS VALIDATION</span>
+            <h2 class="font-display">DBMS Academic Demonstration Laboratory</h2>
+            <p>Live, measurable proof of syllabus concepts: MySQL Cost-Based Query Optimization, EXPLAIN Execution Plans, ACID Transactions, Concurrency & Deadlock cycles, Database Cursors, and Relational Normalization.</p>
+          </div>
+          <div class="lab-badge-box">
+            <span class="pill-badge pill-info">MySQL 8.x Engine</span>
+            <span class="pill-badge pill-sage">InnoDB WAL</span>
+          </div>
+        </div>
+
+        <!-- Sub Tabs for Lab -->
+        <div class="lab-tab-nav">
+          <button class="lab-subtab active" data-subtab="lab-optimizer">1. Query Optimizer & EXPLAIN</button>
+          <button class="lab-subtab" data-subtab="lab-atomicity">2. ACID: Atomicity & Recovery</button>
+          <button class="lab-subtab" data-subtab="lab-consistency">3. ACID: Consistency & Constraints</button>
+          <button class="lab-subtab" data-subtab="lab-isolation">4. ACID: Isolation & MVCC</button>
+          <button class="lab-subtab" data-subtab="lab-concurrency">5. Concurrency & Deadlock</button>
+          <button class="lab-subtab" data-subtab="lab-cursor">6. Stored Procedures & Cursors</button>
+          <button class="lab-subtab" data-subtab="lab-normalization">7. Normalization & Architecture</button>
+        </div>
+
+        <!-- LAB 1: QUERY OPTIMIZER & EXPLAIN -->
+        <div id="lab-optimizer" class="lab-panel active">
+          <div class="callout-card callout-info">
+            <h4 class="callout-title">Concept: Query Execution Plan (QEP) & B-Tree Index Optimization</h4>
+            <p class="callout-text">The MySQL Cost-Based Optimizer analyzes available indexes to choose between a slow <strong>Full Table Scan (ALL)</strong> and an ultra-fast <strong>B-Tree Index Lookup (ref / range)</strong>. Select presets below to compare execution plans and cost metrics live.</p>
+          </div>
+
+          <div class="lab-control-bar">
+            <span class="control-label">PRESET BENCHMARKS:</span>
+            <button class="btn btn-xs btn-chip preset-btn" data-preset="unindexed">Preset A: Unindexed Scan (ALL)</button>
+            <button class="btn btn-xs btn-chip preset-btn" data-preset="indexed">Preset B: Indexed B-Tree Seek</button>
+            <button class="btn btn-xs btn-chip preset-btn" data-preset="composite">Preset C: Composite Index (city, amount)</button>
+            <button class="btn btn-xs btn-chip preset-btn" data-preset="join">Preset D: Multi-Table Relational JOIN</button>
+          </div>
+
+          <div class="query-editor-card">
+            <textarea id="sql-query-input" class="sql-textarea font-mono" rows="3">SELECT * FROM query_demo_data WHERE indexed_tag = 'TAG-0042' LIMIT 50;</textarea>
+            <div class="query-editor-actions">
+              <span class="sql-hint">Supports SELECT, EXPLAIN, SHOW queries against <code>novabank</code> schema.</span>
+              <button class="btn btn-pill-accent btn-sm" id="btn-run-sql">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Execute Query & Analyze Plan
+              </button>
+            </div>
+          </div>
+
+          <!-- Optimization Metrics Banner -->
+          <div id="optimizer-metrics-card" class="optimizer-banner" style="display: none;">
+            <div class="opt-metric">
+              <span class="opt-title">ACCESS TYPE</span>
+              <span class="opt-badge" id="opt-access-type">index</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-title">INDEX UTILIZED</span>
+              <span class="opt-code font-mono" id="opt-index-used">idx_demo_indexed_tag</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-title">ROWS EXAMINED</span>
+              <span class="opt-val font-mono" id="opt-rows-examined">25</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-title">ESTIMATED COST</span>
+              <span class="opt-val font-mono" id="opt-cost">8.75</span>
+            </div>
+            <div class="opt-metric">
+              <span class="opt-title">LATENCY</span>
+              <span class="opt-val font-mono text-success" id="opt-time">0.57 ms</span>
+            </div>
+          </div>
+
+          <div id="optimizer-verdict-box" class="verdict-box" style="display: none;"></div>
+
+          <!-- Query Results & Raw EXPLAIN JSON -->
+          <div class="lab-results-grid">
+            <div class="surface-card">
+              <div class="card-header">
+                <h4 class="card-title">Executed Data Output</h4>
+                <span class="pill-badge" id="query-result-count">0 Rows</span>
+              </div>
+              <div class="table-container small-table" id="query-results-table-container">
+                <div class="text-center text-muted" style="padding: 30px;">Execute a query to inspect live records.</div>
+              </div>
+            </div>
+
+            <div class="surface-card">
+              <div class="card-header">
+                <h4 class="card-title">MySQL Optimizer Plan (JSON EXPLAIN)</h4>
+                <span class="pill-badge pill-info">Engine Metadata</span>
+              </div>
+              <pre class="json-code-block font-mono" id="explain-json-output">// Click 'Execute Query' to generate the MySQL optimizer JSON plan</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 2: ACID ATOMICITY & RECOVERY -->
+        <div id="lab-atomicity" class="lab-panel">
+          <div class="callout-card callout-warm">
+            <h4 class="callout-title">Concept: Atomicity ("All or Nothing") & InnoDB Crash Recovery</h4>
+            <p class="callout-text">Atomicity guarantees that multi-step transactions either commit completely or rollback completely. In this test, ₹1,000 is deducted from Account A. You can choose whether a simulated fatal crash interrupts the system before Account B is credited.</p>
+          </div>
+
+          <div class="surface-card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <h3 class="card-title">Live Atomicity Stress Test</h3>
+              <span class="pill-badge pill-warm">Rollback Simulation</span>
+            </div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-col">
+                  <label class="form-label">Transfer Amount (₹)</label>
+                  <input type="number" id="atomicity-amount" class="form-input" value="1000.00">
+                </div>
+                <div class="form-col">
+                  <label class="form-label">Simulate Fatal Crash Mid-Transfer?</label>
+                  <select id="atomicity-simulate-crash" class="form-select">
+                    <option value="true">YES - Trigger crash after debiting Account A (Forces ROLLBACK)</option>
+                    <option value="false">NO - Allow clean completion (Triggers COMMIT)</option>
+                  </select>
+                </div>
+                <div class="form-col" style="display: flex; align-items: flex-end;">
+                  <button class="btn btn-pill-accent btn-sm" id="btn-run-atomicity" style="width: 100%;">
+                    Run Atomicity Experiment
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stepper Visualization -->
+              <div id="atomicity-stepper" class="stepper-container" style="display: none;">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 3: ACID CONSISTENCY & CONSTRAINTS -->
+        <div id="lab-consistency" class="lab-panel">
+          <div class="callout-card callout-sage">
+            <h4 class="callout-title">Concept: Consistency & Relational Integrity Constraints</h4>
+            <p class="callout-text">Consistency ensures the database transitions only between valid states according to defined schema rules: Domain Integrity (CHECK), Entity Integrity (UNIQUE/PK), and Referential Integrity (FOREIGN KEY RESTRICT).</p>
+          </div>
+
+          <div class="surface-card">
+            <div class="card-header">
+              <h3 class="card-title">Test Constraint Enforcement</h3>
+              <span class="pill-badge pill-sage">Engine Level</span>
+            </div>
+            <div class="card-body">
+              <div class="test-scenarios-grid">
+                <div class="scenario-card">
+                  <h5>Negative Balance Violation</h5>
+                  <p>Attempts to update an account balance below the required minimum threshold. Caught by <code>trg_accounts_before_update</code> and <code>CHECK</code>.</p>
+                  <button class="btn btn-chip btn-xs" id="btn-test-negative-bal">Test Minimum Balance</button>
+                </div>
+                <div class="scenario-card">
+                  <h5>Duplicate National ID (PAN)</h5>
+                  <p>Attempts to register a customer with an already existing PAN. Caught by MySQL <code>UNIQUE</code> constraint.</p>
+                  <button class="btn btn-chip btn-xs" id="btn-test-dup-id">Test Duplicate Key</button>
+                </div>
+                <div class="scenario-card">
+                  <h5>Referential Integrity (Foreign Key)</h5>
+                  <p>Attempts to delete customer ID 1 who holds active bank accounts. Caught by <code>FOREIGN KEY ... ON DELETE RESTRICT</code>.</p>
+                  <button class="btn btn-chip btn-xs" id="btn-test-fk-delete">Test FK Restrict</button>
+                </div>
+              </div>
+
+              <div id="consistency-result-box" class="verdict-box" style="display: none; margin-top: 20px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 4: ACID ISOLATION & MVCC -->
+        <div id="lab-isolation" class="lab-panel">
+          <div class="callout-card callout-info">
+            <h4 class="callout-title">Concept: Transaction Isolation Levels & Multi-Version Concurrency Control (MVCC)</h4>
+            <p class="callout-text">Isolation determines how concurrent transactions interact and prevent concurrency anomalies: Dirty Reads, Non-Repeatable Reads, and Phantom Reads.</p>
+          </div>
+
+          <div class="isolation-selector-bar">
+            <button class="btn btn-chip isolation-btn active" data-level="REPEATABLE READ">REPEATABLE READ (MySQL Default)</button>
+            <button class="btn btn-chip isolation-btn" data-level="READ COMMITTED">READ COMMITTED</button>
+            <button class="btn btn-chip isolation-btn" data-level="READ UNCOMMITTED">READ UNCOMMITTED</button>
+            <button class="btn btn-chip isolation-btn" data-level="SERIALIZABLE">SERIALIZABLE</button>
+          </div>
+
+          <div class="surface-card" style="margin-top: 20px;">
+            <div class="card-header">
+              <h3 class="card-title" id="iso-level-title">Isolation Level: REPEATABLE READ</h3>
+              <span class="pill-badge pill-info" id="iso-current-mysql">MySQL Default</span>
+            </div>
+            <div class="card-body">
+              <div class="anomaly-matrix">
+                <div class="anomaly-cell">
+                  <div class="anomaly-name">Dirty Read</div>
+                  <div class="anomaly-status text-success" id="iso-dirty-read">PREVENTED</div>
+                </div>
+                <div class="anomaly-cell">
+                  <div class="anomaly-name">Non-Repeatable Read</div>
+                  <div class="anomaly-status text-success" id="iso-non-rep">PREVENTED</div>
+                </div>
+                <div class="anomaly-cell">
+                  <div class="anomaly-name">Phantom Read</div>
+                  <div class="anomaly-status text-success" id="iso-phantom">PREVENTED (Next-Key Lock)</div>
+                </div>
+              </div>
+              <div class="iso-explanation-box" id="iso-explanation">
+                Loading isolation details...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 5: CONCURRENCY & DEADLOCK SIMULATOR -->
+        <div id="lab-concurrency" class="lab-panel">
+          <div class="callout-card callout-warm">
+            <h4 class="callout-title">Concept: Row Locking (SELECT ... FOR UPDATE) & Deadlock Detection</h4>
+            <p class="callout-text">When two transactions attempt to acquire locks on the same resources in reverse order, a circular wait (deadlock) occurs. MySQL InnoDB automatically detects cycles and aborts one transaction with <code>ERROR 1213 (Deadlock found)</code>.</p>
+          </div>
+
+          <div class="surface-card">
+            <div class="card-header">
+              <h3 class="card-title">Reverse-Order Row Locking Simulation</h3>
+              <button class="btn btn-pill-warm btn-sm" id="btn-trigger-deadlock">Simulate Concurrent Deadlock</button>
+            </div>
+            <div class="card-body">
+              <div class="concurrency-threads-grid">
+                <div class="thread-box">
+                  <h5>Thread 1 (Worker A)</h5>
+                  <div class="thread-step">1. <code>SELECT * FROM accounts WHERE account_id = 1 FOR UPDATE;</code></div>
+                  <div class="thread-step">2. Sleep 400ms</div>
+                  <div class="thread-step">3. <code>SELECT * FROM accounts WHERE account_id = 2 FOR UPDATE;</code></div>
+                  <div class="thread-result" id="thread-a-output">Awaiting trigger...</div>
+                </div>
+                <div class="thread-box">
+                  <h5>Thread 2 (Worker B)</h5>
+                  <div class="thread-step">1. <code>SELECT * FROM accounts WHERE account_id = 2 FOR UPDATE;</code></div>
+                  <div class="thread-step">2. Sleep 400ms</div>
+                  <div class="thread-step">3. <code>SELECT * FROM accounts WHERE account_id = 1 FOR UPDATE;</code></div>
+                  <div class="thread-result" id="thread-b-output">Awaiting trigger...</div>
+                </div>
+              </div>
+
+              <div class="solution-card" style="margin-top: 20px;">
+                <h5>How NovaBank Eliminates Deadlocks in Production:</h5>
+                <p>In <code>sp_transfer_funds</code>, NovaBank orders account IDs deterministically before acquiring locks: <code>IF v_from_id &lt; v_to_id THEN SELECT ... v_from_id FOR UPDATE; SELECT ... v_to_id FOR UPDATE;</code>. Because all concurrent transfers lock resources in strictly ascending numerical order, circular wait conditions become mathematically impossible!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 6: STORED PROCEDURES & CURSORS -->
+        <div id="lab-cursor" class="lab-panel">
+          <div class="callout-card callout-sage">
+            <h4 class="callout-title">Concept: Database Cursors & Batch Stored Procedures</h4>
+            <p class="callout-text">Stored procedure <code>sp_monthly_interest_accrual</code> uses a MySQL <code>CURSOR</code> to iterate row-by-row across all active Savings accounts, compute monthly accrued interest, update balances, and record individual transaction records atomically.</p>
+          </div>
+
+          <div class="surface-card">
+            <div class="card-header">
+              <h3 class="card-title">Batch Cursor Execution (sp_monthly_interest_accrual)</h3>
+              <button class="btn btn-pill-dark btn-sm" id="btn-run-interest-batch">Trigger Interest Accrual Batch</button>
+            </div>
+            <div class="card-body">
+              <div id="cursor-summary-stats" class="stats-grid" style="display: none; margin-bottom: 20px;">
+                <div class="stat-card">
+                  <div class="stat-label">PROCESSED ACCOUNTS</div>
+                  <div class="stat-value font-mono" id="cursor-count">0</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">TOTAL INTEREST CREDITED</div>
+                  <div class="stat-value font-mono text-success" id="cursor-total-interest">₹0.00</div>
+                </div>
+              </div>
+
+              <h5 style="margin-bottom: 12px; font-size: 0.9rem;">Generated Interest Credit Ledger Records:</h5>
+              <div class="table-container small-table">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Reference</th>
+                      <th>Amount Credited</th>
+                      <th>Balance After</th>
+                      <th>Description</th>
+                      <th>Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-cursor-results">
+                    <tr><td colspan="5" class="text-center text-muted">Click 'Trigger Interest Accrual Batch' to run cursor procedure.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 7: NORMALIZATION & ARCHITECTURE -->
+        <div id="lab-normalization" class="lab-panel">
+          <div class="callout-card callout-info">
+            <h4 class="callout-title">Concept: Relational Schema Normalization (1NF, 2NF, 3NF, BCNF)</h4>
+            <p class="callout-text">NovaBank's schema is normalized to Boyce-Codd Normal Form (BCNF) to eliminate Insertion, Update, and Deletion anomalies while preserving referential integrity across 11 core tables.</p>
+          </div>
+
+          <div class="surface-card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <h3 class="card-title">Normalization Rationale</h3>
+              <span class="pill-badge pill-info">Form Breakdown</span>
+            </div>
+            <div class="card-body" id="normalization-cards-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="surface-card">
+            <div class="card-header">
+              <h3 class="card-title">Schema Relational Model (Foreign Key Dependencies)</h3>
+              <span class="pill-badge pill-sage">Referential Graph</span>
+            </div>
+            <div class="card-body">
+              <div class="table-container small-table">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Table Name</th>
+                      <th>Primary Key</th>
+                      <th>Foreign Key References</th>
+                      <th>Normalization Level</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-normalization-tables">
+                    <!-- Rendered via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: TRANSFER FUNDS -->
+  <div class="modal-backdrop" id="modal-transfer">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title font-display">Atomic Fund Transfer</h3>
+        <button class="modal-close" data-close="modal-transfer">&times;</button>
+      </div>
+      <form id="form-transfer">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">From Account (Source)</label>
+            <select id="transfer-from-account" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">To Account (Recipient)</label>
+            <select id="transfer-to-account" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Transfer Amount (₹)</label>
+            <input type="number" id="transfer-amount" class="form-input font-mono" min="1" step="0.01" placeholder="e.g. 5000.00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description / Memo</label>
+            <input type="text" id="transfer-desc" class="form-input" value="Instant IMPS/NEFT Transfer">
+          </div>
+          <div class="procedure-callout">
+            <strong>DBMS Stored Procedure:</strong> Invokes <code>sp_transfer_funds</code> with deterministic row-level locking (<code>SELECT ... FOR UPDATE</code>) and automated rollback on failure.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-chip" data-close="modal-transfer">Cancel</button>
+          <button type="submit" class="btn btn-pill-dark" id="btn-submit-transfer">Execute Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DEPOSIT / WITHDRAW -->
+  <div class="modal-backdrop" id="modal-cash-action">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title font-display" id="cash-modal-title">Cash Transaction</h3>
+        <button class="modal-close" data-close="modal-cash-action">&times;</button>
+      </div>
+      <form id="form-cash-action">
+        <input type="hidden" id="cash-action-type" value="DEPOSIT">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Account</label>
+            <select id="cash-account-select" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" id="cash-amount" class="form-input font-mono" min="1" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" id="cash-desc" class="form-input" value="Cash Transaction">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-chip" data-close="modal-cash-action">Cancel</button>
+          <button type="submit" class="btn btn-pill-dark" id="btn-submit-cash">Process Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: OPEN ACCOUNT -->
+  <div class="modal-backdrop" id="modal-open-account">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title font-display">Open New Bank Account</h3>
+        <button class="modal-close" data-close="modal-open-account">&times;</button>
+      </div>
+      <form id="form-open-account">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Customer</label>
+            <select id="open-customer-select" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Branch</label>
+            <select id="open-branch-select" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Type</label>
+            <select id="open-type-select" class="form-select" required>
+              <option value="SAVINGS">Savings Account (4.50% p.a.)</option>
+              <option value="CHECKING">Current Account (3.50% p.a.)</option>
+              <option value="BUSINESS">Business Current (3.00% p.a.)</option>
+              <option value="FIXED_DEPOSIT">Fixed Deposit (7.25% p.a.)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label class="form-label">Initial Deposit (₹)</label>
+              <input type="number" id="open-initial-deposit" class="form-input font-mono" min="1000" step="0.01" value="2500.00" required>
+            </div>
+            <div class="form-col">
+              <label class="form-label">Min Balance (₹)</label>
+              <input type="number" id="open-min-balance" class="form-input font-mono" min="0" step="0.01" value="1000.00" required>
+            </div>
+          </div>
+          <div class="procedure-callout">
+            Invokes procedure <code>sp_open_account</code>, auto-generates 10-digit account number, and inserts opening deposit.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-chip" data-close="modal-open-account">Cancel</button>
+          <button type="submit" class="btn btn-pill-dark">Open Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: APPLY LOAN -->
+  <div class="modal-backdrop" id="modal-apply-loan">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title font-display">Apply For Loan Facility</h3>
+        <button class="modal-close" data-close="modal-apply-loan">&times;</button>
+      </div>
+      <form id="form-apply-loan">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Borrower (Customer)</label>
+            <select id="loan-customer-select" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Disbursement Account</label>
+            <select id="loan-account-select" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Facility Type</label>
+            <select id="loan-type-select" class="form-select">
+              <option value="PERSONAL">Personal Loan (12.50% p.a.)</option>
+              <option value="AUTO">Auto Loan (9.25% p.a.)</option>
+              <option value="HOME">Home Mortgage (8.50% p.a.)</option>
+              <option value="BUSINESS">Business Expansion (11.50% p.a.)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label class="form-label">Principal Amount (₹)</label>
+              <input type="number" id="loan-principal" class="form-input font-mono" min="10000" step="5000" value="100000" required>
+            </div>
+            <div class="form-col">
+              <label class="form-label">Term (Months)</label>
+              <input type="number" id="loan-term" class="form-input font-mono" min="6" max="360" value="36" required>
+            </div>
+          </div>
+          <div class="procedure-callout">
+            Invokes procedure <code>sp_apply_loan</code>. Computes monthly EMI formula in MySQL and disburses principal directly into account.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-chip" data-close="modal-apply-loan">Cancel</button>
+          <button type="submit" class="btn btn-pill-dark">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/accounts.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/loans.js"></script>
+  <script src="js/lab.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
